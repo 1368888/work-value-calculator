@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    touch-action: manipulation;
 }
 
 body {
@@ -74,6 +75,8 @@ input, select {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+    min-height: 44px;
+    touch-action: manipulation;
 }
 
 input::placeholder {
@@ -92,6 +95,8 @@ button {
     font-size: 1.1rem;
     cursor: pointer;
     transition: background-color 0.3s;
+    min-height: 44px;
+    touch-action: manipulation;
 }
 
 button:hover {
@@ -143,8 +148,20 @@ button:hover {
 }
 
 @media (max-width: 600px) {
+    input, select, button {
+        font-size: 16px !important;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
     .container {
-        margin: 1rem;
+        margin: 0.5rem;
         padding: 1rem;
+    }
+
+    #result {
+        margin-top: 1rem;
+        padding: 0.5rem;
     }
 } 
