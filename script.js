@@ -3,36 +3,23 @@ let isPageLoaded = false;
 
 // 检查页面是否完全加载
 function checkPageLoaded() {
-    return document.readyState === 'complete' && 
-           document.getElementById('calculatorForm') &&
-           document.getElementById('result');
+    return document.readyState === 'complete';
 }
 
 document.getElementById('calculatorForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // 确保页面完全加载
-    if (!isPageLoaded) {
-        alert('页面正在加载，请稍候...');
-        return;
-    }
-    
     try {
         // 获取输入值并进行验证
-        const salary = parseFloat(document.getElementById('salary').value);
-        // iOS Safari 的数字输入处理
+        const salary = parseFloat(document.getElementById('salary').value) || 0;
+        // 数字输入处理
         const workHours = (parseFloat(document.getElementById('workHours').value) || 0) / 60;
         const commuteHours = (parseFloat(document.getElementById('commuteHours').value) || 0) / 60;
         const slackHours = (parseFloat(document.getElementById('slackHours').value) || 0) / 60;
         
         // 验证输入值
-        if (isNaN(salary) || isNaN(workHours) || isNaN(commuteHours) || isNaN(slackHours)) {
-            alert('请输入有效的数字');
-            return;
-        }
-        
         if (salary <= 0 || workHours <= 0) {
-            alert('日薪和工作时长必须大于0');
+            alert('请输入有效的数字');
             return;
         }
         
@@ -50,10 +37,6 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
         
         // 显示结果
         const resultElement = document.getElementById('result');
-        if (!resultElement) {
-            alert('页面加载异常，请刷新重试');
-            return;
-        }
         resultElement.classList.remove('hidden');
         const scoreElement = document.getElementById('score');
         const commentElement = document.getElementById('comment');
@@ -82,36 +65,26 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
             alert('计算结果无效，请检查输入值');
         }
     } catch (error) {
-        // 错误处理
         console.error('计算错误:', error);
         alert('计算出错，请检查输入值是否正确');
     }
     
-    // iOS Safari 兼容的平滑滚动
+    // 平滑滚动到结果
     try {
         const resultElement = document.getElementById('result');
-        if (resultElement) {
-            resultElement.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'nearest'
-            });
-        }
+        window.scrollTo({
+            top: resultElement.offsetTop,
+            behavior: 'smooth'
+        });
     } catch (e) {
-        // 降级处理
-        const resultElement = document.getElementById('result');
-        if (resultElement) {
-            window.scrollTo(0, resultElement.offsetTop);
-        }
+        window.scrollTo(0, document.getElementById('result').offsetTop);
     }
 });
 
 // 添加输入验证
 document.querySelectorAll('input[type="number"]').forEach(input => {
-    // iOS Safari 输入优化
+    // 移动端输入优化
     input.setAttribute('inputmode', 'decimal');
-    input.setAttribute('pattern', '[0-9]*');
-    input.setAttribute('autocomplete', 'off');
-    input.setAttribute('novalidate', 'true');
     
     input.addEventListener('input', function() {
         const value = parseFloat(this.value) || 0;
@@ -121,21 +94,8 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
     });
 });
 
-// 确保页面加载完成后初始化
+// 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
-    // 初始化加载状态检查
-    if (checkPageLoaded()) {
-        isPageLoaded = true;
-    } else {
-        // 如果页面未完全加载，等待加载完成
-        const loadCheckInterval = setInterval(() => {
-            if (checkPageLoaded()) {
-                isPageLoaded = true;
-                clearInterval(loadCheckInterval);
-            }
-        }, 100);
-    }
-
     // 隐藏结果区域
     const resultElement = document.getElementById('result');
     if (resultElement) {
@@ -148,14 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('commuteHours').value = '';
     document.getElementById('slackHours').value = '';
     
-    // iOS Safari 触摸优化
+    // 移动端触摸优化
     document.addEventListener('touchstart', function() {}, false);
-});
-
-// 添加页面可见性变化监听
-document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible') {
-        // 页面重新可见时检查加载状态
-        isPageLoaded = checkPageLoaded();
-    }
 });
