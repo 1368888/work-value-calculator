@@ -65,7 +65,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
         }
         
         // 简单的滚动
-        window.scrollTo(0, resultElement.offsetTop);
+        window.scrollTo(0, resultElement.offsetTop);  
         
     } catch (error) {
         alert('计算出错，��检查输入值是否正确');
