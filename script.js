@@ -1,85 +1,118 @@
-// 全局变量用于跟踪页面加载状态
-let isPageLoaded = false;
-
-// 检查页面是否完全加载
-function checkPageLoaded() {
-    return document.readyState === 'complete';
-}
-
-document.getElementById('calculatorForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+// 等待页面完全加载
+window.addEventListener('load', function() {
+    const form = document.getElementById('calculatorForm');
+    const result = document.getElementById('result');
     
-    try {
-        // 获取输入值并进行验证
-        const salary = parseFloat(document.getElementById('salary').value) || 0;
-        const workHours = (parseFloat(document.getElementById('workHours').value) || 0) / 60;
-        const commuteHours = (parseFloat(document.getElementById('commuteHours').value) || 0) / 60;
-        const slackHours = (parseFloat(document.getElementById('slackHours').value) || 0) / 60;
-        
-        // 验证输入值
-        if (salary <= 0 || workHours <= 0) {
-            alert('请输入有效的数字');
-            return;
+    // 隐藏结果区域
+    if (result) {
+        result.classList.add('hidden');
+    }
+    
+    // 清空所有输入框
+    ['salary', 'workHours', 'commuteHours', 'slackHours'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.value = '';
         }
-        
-        // 获取系数
-        const educationCoef = parseFloat(document.getElementById('education').value);
-        const workEnvCoef = parseFloat(document.getElementById('workEnvironment').value);
-        const genderEnvCoef = parseFloat(document.getElementById('genderEnvironment').value);
-        const colleagueEnvCoef = parseFloat(document.getElementById('colleagueEnvironment').value);
-        
-        // 计算综合环境系数
-        const environmentCoef = workEnvCoef * genderEnvCoef * colleagueEnvCoef;
-        
-        // 计算工作性价比
-        const workValue = (salary * environmentCoef) / (35 * (workHours + commuteHours - 0.5 * slackHours) * educationCoef);
-        
-        // 显示结果
-        const resultElement = document.getElementById('result');
-        resultElement.classList.remove('hidden');
-        const scoreElement = document.getElementById('score');
-        const commentElement = document.getElementById('comment');
-        
-        // 确保结果是有效数字
-        if (isFinite(workValue) && workValue > 0) {
-            scoreElement.textContent = workValue.toFixed(2);
-            
-            // 根据性价比显示不同评价
-            let comment = '';
-            if (workValue > 2.0) {
-                comment = '爽到爆！😆';
-                commentElement.className = 'super-happy';
-            } else if (workValue > 1.5) {
-                comment = '很爽！😊';
-                commentElement.className = 'happy';
-            } else if (workValue < 0.8) {
-                comment = '很惨...😢';
-                commentElement.className = 'sad';
-            } else {
-                comment = '一般 😐';
-                commentElement.className = 'normal';
-            }
-            commentElement.textContent = comment;
-        } else {
-            alert('计算结果无效，请检查输入值');
-        }
-        
-        // 简单的滚动
-        window.scrollTo(0, resultElement.offsetTop);
-        
-    } catch (error) {
-        alert('计算出错，��检查输入值是否正确');
+    });
+    
+    // 表单提交处理
+    if (form) {
+        form.addEventListener('submit', handleSubmit);
     }
 });
 
-// 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', function() {
-    // 隐藏结果区域
-    document.getElementById('result').classList.add('hidden');
+// 处理表单提交
+function handleSubmit(e) {
+    e.preventDefault();
     
-    // 清空输入框
-    document.getElementById('salary').value = '';
-    document.getElementById('workHours').value = '';
-    document.getElementById('commuteHours').value = '';
-    document.getElementById('slackHours').value = '';
-});
+    try {
+        // 获取所有输入值
+        const inputs = {
+            salary: getNumberValue('salary'),
+            workHours: getNumberValue('workHours') / 60,
+            commuteHours: getNumberValue('commuteHours') / 60,
+            slackHours: getNumberValue('slackHours') / 60
+        };
+        
+        // 基本验证
+        if (inputs.salary <= 0 || inputs.workHours <= 0) {
+            alert('请输入有效的日薪���工作时长');
+            return;
+        }
+        
+        // 获取所有系数
+        const coefs = {
+            education: getNumberValue('education'),
+            workEnv: getNumberValue('workEnvironment'),
+            gender: getNumberValue('genderEnvironment'),
+            colleague: getNumberValue('colleagueEnvironment')
+        };
+        
+        // 计算结果
+        const environmentCoef = coefs.workEnv * coefs.gender * coefs.colleague;
+        const workValue = (inputs.salary * environmentCoef) / 
+                         (35 * (inputs.workHours + inputs.commuteHours - 0.5 * inputs.slackHours) * coefs.education);
+        
+        // 显示结果
+        showResult(workValue);
+        
+    } catch (error) {
+        alert('计算出错，请检查输入是否正确');
+    }
+}
+
+// 获取数字值
+function getNumberValue(id) {
+    const element = document.getElementById(id);
+    return element ? (parseFloat(element.value) || 0) : 0;
+}
+
+// 显示结果
+function showResult(value) {
+    const result = document.getElementById('result');
+    const score = document.getElementById('score');
+    const comment = document.getElementById('comment');
+    
+    if (!result || !score || !comment) {
+        alert('页面元素加载异常，请刷新重试');
+        return;
+    }
+    
+    if (!isFinite(value) || value <= 0) {
+        alert('计算结果无效，请检查输入值');
+        return;
+    }
+    
+    // 显示数值
+    result.classList.remove('hidden');
+    score.textContent = value.toFixed(2);
+    
+    // 设置评价
+    let commentText = '';
+    let className = '';
+    
+    if (value > 2.0) {
+        commentText = '爽到爆！😆';
+        className = 'super-happy';
+    } else if (value > 1.5) {
+        commentText = '很爽！😊';
+        className = 'happy';
+    } else if (value < 0.8) {
+        commentText = '很惨...😢';
+        className = 'sad';
+    } else {
+        commentText = '一般 😐';
+        className = 'normal';
+    }
+    
+    comment.textContent = commentText;
+    comment.className = className;
+    
+    // 简单滚动到结果
+    try {
+        window.scrollTo(0, result.offsetTop);
+    } catch (e) {
+        // 忽略滚动错误
+    }
+}
