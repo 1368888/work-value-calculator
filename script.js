@@ -51,7 +51,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
                 commentElement.className = 'super-happy';
             } else if (workValue > 1.5) {
                 comment = '很爽！😊';
-                commentElement.className = 'happy';  
+                commentElement.className = 'happy';
             } else if (workValue < 0.8) {
                 comment = '很惨...😢';
                 commentElement.className = 'sad';
