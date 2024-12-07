@@ -11,8 +11,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
     
     try {
         // 获取输入值并进行验证
-        const salary = parseFloat(document.getElementById('salary').value) || 0;
-        // 数字输入处理
+        const salary = parseFloat(document.getElementById('salary').value) || 0;  
         const workHours = (parseFloat(document.getElementById('workHours').value) || 0) / 60;
         const commuteHours = (parseFloat(document.getElementById('commuteHours').value) || 0) / 60;
         const slackHours = (parseFloat(document.getElementById('slackHours').value) || 0) / 60;
@@ -64,50 +63,23 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
         } else {
             alert('计算结果无效，请检查输入值');
         }
+        
+        // 简单的滚动
+        window.scrollTo(0, resultElement.offsetTop);
+        
     } catch (error) {
-        console.error('计算错误:', error);
-        alert('计算出错，请检查输入值是否正确');
+        alert('计算出错，��检查输入值是否正确');
     }
-    
-    // 平滑滚动到结果
-    try {
-        const resultElement = document.getElementById('result');
-        window.scrollTo({
-            top: resultElement.offsetTop,
-            behavior: 'smooth'
-        });
-    } catch (e) {
-        window.scrollTo(0, document.getElementById('result').offsetTop);
-    }
-});
-
-// 添加输入验证
-document.querySelectorAll('input[type="number"]').forEach(input => {
-    // 移动端输入优化
-    input.setAttribute('inputmode', 'decimal');
-    
-    input.addEventListener('input', function() {
-        const value = parseFloat(this.value) || 0;
-        if (value < 0) {
-            this.value = 0;
-        }
-    });
 });
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
     // 隐藏结果区域
-    const resultElement = document.getElementById('result');
-    if (resultElement) {
-        resultElement.classList.add('hidden');
-    }
+    document.getElementById('result').classList.add('hidden');
     
-    // 设置输入框的默认值
+    // 清空输入框
     document.getElementById('salary').value = '';
     document.getElementById('workHours').value = '';
     document.getElementById('commuteHours').value = '';
     document.getElementById('slackHours').value = '';
-    
-    // 移动端触摸优化
-    document.addEventListener('touchstart', function() {}, false);
 });
