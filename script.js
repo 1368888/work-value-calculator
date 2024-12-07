@@ -11,7 +11,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
     
     try {
         // 获取输入值并进行验证
-        const salary = parseFloat(document.getElementById('salary').value) || 0;  
+        const salary = parseFloat(document.getElementById('salary').value) || 0;
         const workHours = (parseFloat(document.getElementById('workHours').value) || 0) / 60;
         const commuteHours = (parseFloat(document.getElementById('commuteHours').value) || 0) / 60;
         const slackHours = (parseFloat(document.getElementById('slackHours').value) || 0) / 60;
@@ -51,7 +51,7 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
                 commentElement.className = 'super-happy';
             } else if (workValue > 1.5) {
                 comment = '很爽！😊';
-                commentElement.className = 'happy';
+                commentElement.className = 'happy';  
             } else if (workValue < 0.8) {
                 comment = '很惨...😢';
                 commentElement.className = 'sad';
