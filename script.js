@@ -4,9 +4,10 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
     try {
         // 获取输入值并进行验证
         const salary = parseFloat(document.getElementById('salary').value);
-        const workHours = parseFloat(document.getElementById('workHours').value) / 60;
-        const commuteHours = parseFloat(document.getElementById('commuteHours').value) / 60;
-        const slackHours = parseFloat(document.getElementById('slackHours').value) / 60;
+        // iOS Safari 的数字输入处理
+        const workHours = (parseFloat(document.getElementById('workHours').value) || 0) / 60;
+        const commuteHours = (parseFloat(document.getElementById('commuteHours').value) || 0) / 60;
+        const slackHours = (parseFloat(document.getElementById('slackHours').value) || 0) / 60;
         
         // 验证输入值
         if (isNaN(salary) || isNaN(workHours) || isNaN(commuteHours) || isNaN(slackHours)) {
@@ -63,16 +64,29 @@ document.getElementById('calculatorForm').addEventListener('submit', function(e)
         // 错误处理
         console.error('计算错误:', error);
         alert('计算出错，请检查输入值是否正确');
-    }  
+    }
     
-    // 自动滚动到结果区域
-    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+    // iOS Safari 兼容的平滑滚动
+    try {
+        document.getElementById('result').scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    } catch (e) {
+        // 降级处理
+        window.scrollTo(0, document.getElementById('result').offsetTop);
+    }
 });
 
 // 添加输入验证
 document.querySelectorAll('input[type="number"]').forEach(input => {
+    // iOS Safari 输入优化
+    input.setAttribute('inputmode', 'decimal');
+    input.setAttribute('pattern', '[0-9]*');
+    
     input.addEventListener('input', function() {
-        if (this.value < 0) {
+        const value = parseFloat(this.value) || 0;
+        if (value < 0) {
             this.value = 0;
         }
     });
@@ -91,4 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('workHours').value = '';
     document.getElementById('commuteHours').value = '';
     document.getElementById('slackHours').value = '';
-}); 
+    
+    // iOS Safari 触摸优化
+    document.addEventListener('touchstart', function() {}, false);
+});
